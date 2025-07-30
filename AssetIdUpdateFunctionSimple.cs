@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Azure.Identity;
@@ -28,9 +28,10 @@ namespace AssetID_Update
             _graphServiceClient = new GraphServiceClient(clientSecretCredential);
         }
 
-        [FunctionName("AssetIdUpdateFunction")]
-        public async Task Run([TimerTrigger("0 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        [Function("AssetIdUpdateFunction")]
+        public async Task Run([TimerTrigger("0 */1 * * * *")] object myTimer, FunctionContext context)
         {
+            var log = context.GetLogger("AssetIdUpdateFunction");
             log.LogInformation($"Asset ID Update function started at: {DateTime.Now}");
 
             try
