@@ -2,6 +2,10 @@
 
 An Azure Function that automatically detects files with "FAR - Label" retention labels in SharePoint and OneDrive, and updates them with Asset IDs if they don't already have one.
 
+## 🚀 Quick Deploy
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkarkiabhijeet%2Fretentionlabel-functionapp%2Fmain%2Fazuredeploy.json)
+
 ## Overview
 
 This solution provides automated Asset ID management for compliance purposes by:
@@ -24,7 +28,7 @@ This solution provides automated Asset ID management for compliance purposes by:
 - Azure subscription
 - Azure AD application with appropriate permissions
 - Azure Functions Core Tools (for local development)
-- .NET 6 SDK
+- .NET 8 SDK
 
 ## Required Azure AD Permissions
 
@@ -35,14 +39,20 @@ Your Azure AD application needs the following Microsoft Graph API permissions:
 - `User.Read.All` - Read user profiles to access OneDrive
 - `InformationProtectionPolicy.Read.All` - Read retention labels
 
+## 📖 Documentation
+
+- [Customer Setup Guide](CUSTOMER_SETUP_GUIDE.md) - Complete deployment instructions
+- [Deployment Guide](DEPLOYMENT.md) - Step-by-step Azure deployment
+- [Project Summary](PROJECT_SUMMARY.md) - Technical overview and architecture
+
 ## Setup Instructions
 
 ### 1. Clone and Setup Project
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd AssetID-Update
+git clone https://github.com/karkiabhijeet/retentionlabel-functionapp.git
+cd retentionlabel-functionapp
 
 # Install dependencies
 dotnet restore
@@ -57,7 +67,7 @@ dotnet restore
 
 ### 3. Configure Local Settings
 
-Update `local.settings.json` with your Azure AD application details:
+Copy `local.settings.json.template` to `local.settings.json` and update with your Azure AD application details:
 
 ```json
 {
@@ -75,25 +85,14 @@ Update `local.settings.json` with your Azure AD application details:
 ### 4. Local Development
 
 ```bash
-# Start the Azure Storage Emulator (if using local storage)
+# Start Azurite (Azure Storage Emulator)
 # Run the function locally
 func start
 ```
 
 ### 5. Deploy to Azure
 
-```bash
-# Create Function App in Azure
-az functionapp create --resource-group <resource-group> --consumption-plan-location <location> --runtime dotnet --functions-version 4 --name <function-app-name> --storage-account <storage-account>
-
-# Deploy the function
-func azure functionapp publish <function-app-name>
-
-# Set application settings in Azure
-az functionapp config appsettings set --name <function-app-name> --resource-group <resource-group> --settings "TENANT_ID=your-tenant-id"
-az functionapp config appsettings set --name <function-app-name> --resource-group <resource-group> --settings "CLIENT_ID=your-client-id"
-az functionapp config appsettings set --name <function-app-name> --resource-group <resource-group> --settings "CLIENT_SECRET=your-client-secret"
-```
+See the [Customer Setup Guide](CUSTOMER_SETUP_GUIDE.md) for complete deployment instructions.
 
 ## How It Works
 
@@ -129,36 +128,6 @@ Monitor logs through:
 - Application Insights (if configured)
 - Local console output during development
 
-## Customization
-
-### File Type Support
-Modify the `IsSupportedFileType` method to add or remove supported file extensions:
-
-```csharp
-private bool IsSupportedFileType(string fileName)
-{
-    var supportedExtensions = new[] { ".txt", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".pdf" };
-    return supportedExtensions.Any(ext => fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
-}
-```
-
-### Asset ID Format
-Customize the `GenerateAssetId` method to change the Asset ID format:
-
-```csharp
-private string GenerateAssetId()
-{
-    return $"AST-{DateTime.Now:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8].ToUpper()}";
-}
-```
-
-### Schedule
-Modify the timer trigger CRON expression in the function attribute:
-
-```csharp
-[TimerTrigger("0 0 6 * * *")] // Currently set to 6 AM UTC daily
-```
-
 ## Security Considerations
 
 - Store sensitive configuration in Azure Key Vault for production
@@ -166,23 +135,6 @@ Modify the timer trigger CRON expression in the function attribute:
 - Regularly rotate client secrets
 - Monitor API usage and permissions
 - Implement proper error handling to avoid credential exposure
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication Errors**: Verify Azure AD application permissions and credentials
-2. **File Access Denied**: Check that the application has appropriate Graph API permissions
-3. **Retention Label Not Found**: Ensure the label exists and the application can read retention policies
-4. **Rate Limiting**: Implement retry logic for Graph API calls
-
-### Debug Mode
-
-For local debugging, set the timer to run more frequently:
-
-```csharp
-[TimerTrigger("0 */1 * * * *")] // Every minute for testing
-```
 
 ## Contributing
 
