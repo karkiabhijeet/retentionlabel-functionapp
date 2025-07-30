@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "TENANT_ID": "your-azure-ad-tenant-id",
+    "CLIENT_ID": "your-azure-ad-application-client-id", 
+    "CLIENT_SECRET": "your-azure-ad-application-client-secret"
+  }
+}

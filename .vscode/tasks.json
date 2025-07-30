@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build and Run Azure Function",
+			"type": "shell",
+			"command": "func",
+			"args": [
+				"start"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": [
+				"$func-watch"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+	]
+}
